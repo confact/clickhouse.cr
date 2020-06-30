@@ -35,7 +35,7 @@ module Clickhouse::Executable
 
     Response.new(uri: uri, req: req, http: http_res, time: (stopped_at - started_at))
 
-  rescue ex : Errno
+  rescue ex : Exception
     raise Clickhouse::CannotConnectError.new("#{ex.class}: #{ex.message}").tap(&.uri= uri)
   end
 
