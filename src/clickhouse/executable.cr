@@ -9,9 +9,13 @@ module Clickhouse::Executable
     end
     execute(query)
   end
-  
+
   def execute(sql : String) : Response
     execute(Request.new(query: sql))
+  end
+
+  def insert(sql : String) : Response
+    execute(InsertRequest.new(query: sql))
   end
 
   def execute_as_csv(sql : String) : Array(Array(String))
@@ -19,13 +23,13 @@ module Clickhouse::Executable
     res = execute(req)
     CSV.parse(res.success!.body)
   end
-  
+
   def execute(req : Request) : Response
     http_req = HTTP::Request.new("POST", build_query_param, build_headers, body: req.sql)
     http_client = build_http
 
     @before_execute.try &.each &.call(http_client, http_req)
-    
+
     logger.debug "HTTP request: #{http_req.path}"
     logger.debug "HTTP headers: #{http_req.headers.to_h}"
 
@@ -58,7 +62,7 @@ module Clickhouse::Executable
     end
     buf.sub(/^&/, "/?")
   end
-  
+
   private def host_header
     String.build do |io|
       if host = uri.host
