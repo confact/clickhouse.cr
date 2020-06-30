@@ -68,7 +68,7 @@ struct Clickhouse::Response
       {% i = 0 %}
       Tuple.new(
         {% for type in T %}
-          a[{{i}}].as?({{type.instance}}),
+          (a[{{i}}].as?({{type.instance}}) || raise CastError.new("#{self.class}#map expects {{type.instance}}, but got #{a[{{i}}].class} (row=#{j+1}, col={{i+1}})")),
           {% i = i + 1 %}
         {% end %}
       )
@@ -87,6 +87,55 @@ struct Clickhouse::Response
   #   p [record["name"], record["cnt"]]
   # ```
   def map(**types : **T) forall T
+    map_with_index{|a, j|
+    {% begin %}
+      {% i = 0 %}
+      NamedTuple.new(
+      {% for name, type in T %}
+        {{ name }}:
+          (a[{{i}}].as?({{type.instance}}) || raise CastError.new("#{self.class}#map expects {{type.instance}}, but got #{a[{{i}}].class} (row=#{j+1}, col={{i+1}})")),
+        {% i = i + 1 %}
+      {% end %}
+      )
+    {% end %}
+    }
+  end
+
+  # ```crystal
+  # res = execute <<-SQL
+  #   SELECT   engine, count(*)
+  #   FROM     system.tables
+  #   GROUP BY engine
+  #   SQL
+  # records = res.success!.map(String, UInt64)
+  # records.each do |(name, cnt)|
+  #   p [name, cnt]
+  # ```
+  def map_nil(*types : *T) forall T
+    map_with_index{|a, j|
+    {% begin %}
+      {% i = 0 %}
+      Tuple.new(
+        {% for type in T %}
+          a[{{i}}].as?({{type.instance}}),
+          {% i = i + 1 %}
+        {% end %}
+      )
+    {% end %}
+    }
+  end
+
+  # ```crystal
+  # res = execute <<-SQL
+  #   SELECT   engine, count(*)
+  #   FROM     system.tables
+  #   GROUP BY engine
+  #   SQL
+  # records = res.success!.map(name: String, cnt: UInt64)
+  # records.each do |record|
+  #   p [record["name"], record["cnt"]]
+  # ```
+  def map_nil(**types : **T) forall T
     map_with_index{|a, j|
     {% begin %}
       {% i = 0 %}
