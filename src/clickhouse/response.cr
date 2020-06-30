@@ -68,7 +68,7 @@ struct Clickhouse::Response
       {% i = 0 %}
       Tuple.new(
         {% for type in T %}
-          (a[{{i}}].as?({{type.instance}}) || raise CastError.new("#{self.class}#map expects {{type.instance}}, but got #{a[{{i}}].class} (row=#{j+1}, col={{i+1}})")),
+          (a[{{i}}].as?({{type.instance}}),
           {% i = i + 1 %}
         {% end %}
       )
@@ -93,7 +93,7 @@ struct Clickhouse::Response
       NamedTuple.new(
       {% for name, type in T %}
         {{ name }}:
-          (a[{{i}}].as?({{type.instance}}) || raise CastError.new("#{self.class}#map expects {{type.instance}}, but got #{a[{{i}}].class} (row=#{j+1}, col={{i+1}})")),
+          (a[{{i}}].as?({{type.instance}}),
         {% i = i + 1 %}
       {% end %}
       )
