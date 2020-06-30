@@ -1,6 +1,6 @@
 record Clickhouse::Response,
   uri  : URI,
-  req  : Request,
+  req  : Request | InsertRequest,
   http : HTTP::Client::Response,
   time : Time::Span
 
@@ -92,7 +92,7 @@ struct Clickhouse::Response
       {% i = 0 %}
       NamedTuple.new(
       {% for name, type in T %}
-        {{ name }}: 
+        {{ name }}:
           (a[{{i}}].as?({{type.instance}}) || raise CastError.new("#{self.class}#map expects {{type.instance}}, but got #{a[{{i}}].class} (row=#{j+1}, col={{i+1}})")),
         {% i = i + 1 %}
       {% end %}
@@ -104,7 +104,7 @@ struct Clickhouse::Response
   def success? : Response?
     http.success? ? self : nil
   end
-  
+
   def success! : Response
     success? || raise ServerError.parse(body).tap(&.uri= uri)
   end
