@@ -43,6 +43,25 @@ module Clickhouse::Executable
     raise Clickhouse::CannotConnectError.new("#{ex.class}: #{ex.message}").tap(&.uri= uri)
   end
 
+  def execute(req : InsertRequest) : Response
+    http_req = HTTP::Request.new("POST", build_query_param, build_headers, body: req.sql)
+    http_client = build_http
+
+    @before_execute.try &.each &.call(http_client, http_req)
+
+    logger.debug "HTTP request: #{http_req.path}"
+    logger.debug "HTTP headers: #{http_req.headers.to_h}"
+
+    started_at = Pretty.now
+    http_res   = http_client.exec(http_req)
+    stopped_at = Pretty.now
+
+    Response.new(uri: uri, req: req, http: http_res, time: (stopped_at - started_at))
+
+  rescue ex : Exception
+    raise Clickhouse::CannotConnectError.new("#{ex.class}: #{ex.message}").tap(&.uri= uri)
+  end
+
   private def build_http
     http = HTTP::Client.new(uri)
     http.dns_timeout     = dns_timeout
