@@ -14,6 +14,13 @@ module Clickhouse::Executable
     execute(Request.new(query: sql))
   end
 
+  def execute_as_json(sql : String) : String
+    req = Request.new(sql, OutputFormat::JSON)
+    res = execute(req)
+    parsed = JSON.parse(res.body)
+    parsed["data"].to_json
+  end
+
   def insert(sql : String) : Response
     execute(InsertRequest.new(query: sql))
   end
