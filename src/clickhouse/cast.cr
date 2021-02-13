@@ -20,10 +20,10 @@ module Clickhouse::Cast
       end
     when "DateTime"
       s = cast(any, "String", hint).as(String)
-      Pretty::Time.parse(s, location: ::Time::Location.local)
+      Jq::Time.parse(s, location: ::Time::Location.local)
     when "Date"
       s = cast(any, "String", hint).as(String)
-      Pretty::Time.parse(s, location: ::Time::Location.local).at_beginning_of_day
+      Jq::Time.parse(s, location: ::Time::Location.local).at_beginning_of_day
   # Enum
   # FixedString(N)
     when "Float32"
@@ -37,7 +37,7 @@ module Clickhouse::Cast
         when "false"; 0_u8
         else        ; v.to_u8
         end
-      else            
+      else
         any.as_i.to_u8
       end
     when "UInt16"

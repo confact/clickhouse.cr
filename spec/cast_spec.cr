@@ -41,9 +41,9 @@ describe Clickhouse::Cast do
   cast UInt8 , "true" , 1_u8
   cast UInt8 , "false", 0_u8
 
-  cast DateTime, "2000-01-02T03:04:05Z", Pretty.utc(2000,1,2,3,4,5)
-  cast DateTime, "2000-01-02T03:04:05" , Pretty.now(2000,1,2,3,4,5)
-  cast Date    , "2000-01-02"          , Pretty.now(2000,1,2)
+  cast DateTime, "2000-01-02T03:04:05Z", Jq::Time.utc(2000,1,2,3,4,5)
+  cast DateTime, "2000-01-02T03:04:05" , Jq::Time.now(2000,1,2,3,4,5)
+  cast Date    , "2000-01-02"          , Jq::Time.now(2000,1,2)
 
   cast String, "foo", "foo"
   cast String, ""   , ""
@@ -52,7 +52,7 @@ describe Clickhouse::Cast do
   # Array(T)
   cast Array(Int64), [JSON::Any.new(1_i64),JSON::Any.new(2_i64)], [1_i64,2_i64]
   cast Array(Int64), [JSON::Any.new("1"),JSON::Any.new("2")]    , [1_i64,2_i64]
-  
+
   # Nullable
   cast Nullable(Int64), 1_i64, 1_i64
   cast Nullable(Int64), "1"  , 1_i64
@@ -68,13 +68,13 @@ describe Clickhouse::Cast do
 
   cast Nullable(DateTime), "" , nil
   cast Nullable(DateTime), nil, nil
-  cast Nullable(DateTime), "2000-01-02T03:04:05Z", Pretty.utc(2000,1,2,3,4,5)
-  cast Nullable(DateTime), "2000-01-02T03:04:05" , Pretty.now(2000,1,2,3,4,5)
+  cast Nullable(DateTime), "2000-01-02T03:04:05Z", Jq::Time.utc(2000,1,2,3,4,5)
+  cast Nullable(DateTime), "2000-01-02T03:04:05" , Jq::Time.now(2000,1,2,3,4,5)
 
   cast Nullable(Date), "" , nil
   cast Nullable(Date), nil, nil
-  cast Nullable(Date), "2000-01-02", Pretty.now(2000,1,2)
-  
+  cast Nullable(Date), "2000-01-02", Jq::Time.now(2000,1,2)
+
   context "unsupported type" do
     it "raises CastError" do
       expect_raises Clickhouse::CastError, /unsupported type: 'FixedString\(2\)'/ do

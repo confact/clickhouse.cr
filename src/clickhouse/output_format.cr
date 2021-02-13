@@ -12,13 +12,6 @@ enum Clickhouse::OutputFormat
   Native
   Null
   ODBCDriver
-  Pretty
-  PrettyCompact
-  PrettyCompactMonoBlock
-  PrettyCompactNoEscapes
-  PrettyNoEscapes
-  PrettySpace
-  PrettySpaceNoEscapes
   RowBinary
   RowBinaryWithNamesAndTypes
   TSKV

@@ -37,12 +37,12 @@ module Clickhouse::Executable
 
     @before_execute.try &.each &.call(http_client, http_req)
 
-    logger.debug "HTTP request: #{http_req.path}"
-    logger.debug "HTTP headers: #{http_req.headers.to_h}"
+    logger.debug { "HTTP request: #{http_req.path}" }
+    logger.debug { "HTTP headers: #{http_req.headers.to_h}" }
 
-    started_at = Pretty.now
+    started_at = Jq::Time.now
     http_res   = http_client.exec(http_req)
-    stopped_at = Pretty.now
+    stopped_at = Jq::Time.now
 
     Response.new(uri: uri, req: req, http: http_res, time: (stopped_at - started_at))
 
@@ -56,12 +56,12 @@ module Clickhouse::Executable
 
     @before_execute.try &.each &.call(http_client, http_req)
 
-    logger.debug "HTTP request: #{http_req.path}"
-    logger.debug "HTTP headers: #{http_req.headers.to_h}"
+    logger.debug { "HTTP request: #{http_req.path}" }
+    logger.debug { "HTTP headers: #{http_req.headers.to_h}" }
 
-    started_at = Pretty.now
+    started_at = Jq::Time.now
     http_res   = http_client.exec(http_req)
-    stopped_at = Pretty.now
+    stopped_at = Jq::Time.now
 
     Response.new(uri: uri, req: req, http: http_res, time: (stopped_at - started_at))
 
@@ -81,7 +81,7 @@ module Clickhouse::Executable
     buf = String.build do |s|
       {% for x in %w( user password database profile ) %}
         if {{x.id}}?
-          s << "&{{x.id}}=" << Pretty::URI.escape({{x.id}})
+          s << "&{{x.id}}=" << HTML.escape({{x.id}})
         end
       {% end %}
       s << "&query="
