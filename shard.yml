@@ -8,6 +8,7 @@ dependencies:
     github: maiha/var.cr
   jq:
     github: confact/jq.cr
+    version: ~> 0.9.1
 
 authors:
   - maiha <maiha@wota.jp>
