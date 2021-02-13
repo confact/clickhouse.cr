@@ -1,5 +1,7 @@
 name: clickhouse
-version: 0.6.0
+version: 0.6.1
+
+crystal: 0.36.1
 
 dependencies:
   var:
